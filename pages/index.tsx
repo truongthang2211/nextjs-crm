@@ -17,7 +17,7 @@ export default function Home() {
       setIsLoading(true);
       let data = await (
         await fetch(
-          `http://localhost:3001/giaohangnhanh/shipmentCreate/${dealID}`,
+          `https://nestjs-crm.vercel.app/giaohangnhanh/shipmentCreate/${dealID}`,
           opts
         )
       ).json();
