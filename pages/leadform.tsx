@@ -1,5 +1,6 @@
 import { Button } from "antd";
 import { useState } from "react";
+import Swal from "sweetalert2";
 
 export type Contact = {
   name: string;
@@ -7,6 +8,11 @@ export type Contact = {
   phone: string;
   comment: string;
 };
+const BITRIX_URL_CONTACT =
+  "https://b24-nu8yl7.bitrix24.vn/rest/1/vdqs6wk155951ycg";
+const BITRIX_URL_DEAL =
+  "https://b24-nu8yl7.bitrix24.vn/rest/1/wta91h8u5lyt6rcr";
+
 function LeadForm() {
   const [contact, setContact] = useState<Contact>({
     name: "",
@@ -16,21 +22,42 @@ function LeadForm() {
   });
   const handleSubmit = async (e: any) => {
     e.preventDefault();
-
-    const data = await (
-      await fetch(
-        `https://b24-aypxm5.bitrix24.vn/rest/1/n3re3tc8tbwt97kb/crm.contact.add.json?fields[NAME]=${contact.name}&fields[PHONE][0][VALUE]=${contact.phone}&fields[EMAIL][0][VALUE]=${contact.email}&fields[COMMENTS]=${contact.comment}`
-      )
-    ).json();
-    console.log(data);
-
-    if (data.result) {
-      const data2 = await (
+    try {
+      const data = await (
         await fetch(
-          `https://b24-aypxm5.bitrix24.vn/rest/1/n3re3tc8tbwt97kb/crm.deal.add.json?fields[TITLE]=${contact.name}&fields[STAGE_ID]=NEW&fields[CONTACT_ID]=${data.result}&fields[SOURCE_DESCRIPTION]=LEAD-FORM-WEB`
+          `${BITRIX_URL_CONTACT}/crm.contact.add.json?fields[NAME]=${contact.name}&fields[PHONE][0][VALUE]=${contact.phone}&fields[EMAIL][0][VALUE]=${contact.email}`
         )
       ).json();
-      console.log(data2);
+      console.log(data);
+
+      if (data.result) {
+        const data2 = await (
+          await fetch(
+            `${BITRIX_URL_DEAL}/crm.deal.add.json?fields[TITLE]=${contact.name}&fields[STAGE_ID]=NEW&fields[CONTACT_ID]=${data.result}&fields[COMMENTS]=${contact.comment}&fields[SOURCE_DESCRIPTION]=LEAD-FORM-WEB`
+          )
+        ).json();
+        console.log(data2);
+      }
+      Swal.fire({
+        position: "top-end",
+        icon: "success",
+        title: "Your work has been saved",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+      setContact({
+        name: "",
+        email: "",
+        phone: "",
+        comment: "",
+      });
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Something went wrong!",
+        footer: '<a href="">Why do I have this issue?</a>',
+      });
     }
   };
   return (
@@ -119,7 +146,7 @@ function LeadForm() {
             rows={4}
             name="message"
             id="message"
-            placeholder="Em đẹp lắm"
+            placeholder="Rất xinh đẹp, rất tuyệt vời"
             className="w-full resize-none rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
           ></textarea>
         </div>

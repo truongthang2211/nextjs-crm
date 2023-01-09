@@ -17,13 +17,13 @@ export default function Home() {
       setIsLoading(true);
       let data = await (
         await fetch(
-          `https://nestjs-crm.vercel.app/giaohangnhanh/shipmentCreate/${dealID}`,
+          `http://localhost:3001/giaohangnhanh/shipmentCreate/${dealID}`,
           opts
         )
       ).json();
       console.log(data);
 
-      setData(data.code === 200 ? "Thành công" : null);
+      setData(data.code === 200 ? "Thành công" : data.message);
     } catch (error) {
       setData(null);
       setIsLoading(false);
